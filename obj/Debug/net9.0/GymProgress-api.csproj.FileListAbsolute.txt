@@ -34,3 +34,4 @@
 /home/azz/GymProgress-api/obj/Debug/net9.0/GymProgress-api.pdb
 /home/azz/GymProgress-api/obj/Debug/net9.0/GymProgress-api.genruntimeconfig.cache
 /home/azz/GymProgress-api/obj/Debug/net9.0/ref/GymProgress-api.dll
+/home/azz/GymProgress-api/obj/Debug/net9.0/GymProgress-api.sourcelink.json
