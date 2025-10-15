@@ -12,7 +12,8 @@ builder.Services.AddCors(options =>
 	{
 		policy.WithOrigins("http://localhost:3000")
 		  .AllowAnyHeader()
-		  .AllowAnyMethod();
+		  .AllowAnyMethod()
+		  .AllowCredentials();
 	});
 });
 
@@ -30,15 +31,6 @@ app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 
-var workouts = new List<Workout>();
-
-app.MapPost("/workouts", (Workout workout) =>
-{
-	workouts.Add(workout);
-	return TypedResults.Created($"/workouts/{workout.id}", workout);
-});
-
-
 app.MapGet("/", () =>
 {
 	Console.WriteLine("Hello");
@@ -48,4 +40,3 @@ app.MapGet("/", () =>
 app.Run();
 
 
-public record Workout(string id, DateTime date);
