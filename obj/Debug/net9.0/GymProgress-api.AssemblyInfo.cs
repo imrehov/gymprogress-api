@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GymProgress-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+62a9d8dd95952301af9886088b6af714f8bb76f0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6838d88a688996c4506c8c85736c19f550d9e25b")]
 [assembly: System.Reflection.AssemblyProductAttribute("GymProgress-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GymProgress-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
