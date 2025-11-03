@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
+namespace GymProgressTrackerAPI.Controllers;
+
 [ApiController]
 [Route("v1/workouts")]
 
