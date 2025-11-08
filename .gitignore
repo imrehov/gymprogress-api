@@ -1,0 +1,23 @@
+# --- .NET build artifacts ---
+bin/
+obj/
+
+# --- SQLite database ---
+*.db
+*.db-shm
+*.db-wal
+
+# --- EF Core migration temporary files ---
+Migrations/ (optional — keep if you want migrations tracked)
+
+# --- User / environment files ---
+*.user
+*.suo
+
+# --- VS / JetBrains IDE files ---
+.vscode/
+.idea/
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
