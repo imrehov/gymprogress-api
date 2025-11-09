@@ -12,6 +12,7 @@ public class WorkoutsController(AppDbContext db) : ControllerBase
 {
 	// maps requests on this route, fromquery frombody etc self-explanatory
 
+
 	[HttpGet]
 	public async Task<IActionResult> List([FromQuery] DateOnly from, [FromQuery] DateOnly to)
 	{

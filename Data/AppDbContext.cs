@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using GymProgressTrackerAPI.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace GymProgressTrackerAPI.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
 {
+	public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+	{
+	}
 	public DbSet<Workout> Workouts => Set<Workout>();
 	public DbSet<WorkoutSet> WorkoutSets => Set<WorkoutSet>();
 	public DbSet<Exercise> Exercises => Set<Exercise>();

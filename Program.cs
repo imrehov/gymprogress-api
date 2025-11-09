@@ -1,5 +1,7 @@
 using GymProgressTrackerAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using GymProgressTrackerAPI.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,30 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddDbContext<AppDbContext>(opt =>
 		opt.UseSqlite("Data Source=gym.db"));
+
+//auth stuff
+
+builder.Services
+.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
+		{
+			options.Password.RequireNonAlphanumeric = false;
+			options.Password.RequireUppercase = false;
+			options.Password.RequiredLength = 6;
+		})
+	.AddEntityFrameworkStores<AppDbContext>()
+	.AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+	.AddCookie(IdentityConstants.ApplicationScheme, options =>
+			{
+				options.LoginPath = "/login";
+				options.SlidingExpiration = true;
+				options.Cookie.SameSite = SameSiteMode.None;
+				options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+			});
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -33,6 +59,11 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("AllowFrontend");
+
+//auth stuff again
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
