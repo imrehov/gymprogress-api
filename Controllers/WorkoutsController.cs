@@ -96,4 +96,15 @@ public class WorkoutsController(AppDbContext db) : ControllerBase
 		await db.SaveChangesAsync();
 		return NoContent();
 	}
+
+	[HttpDelete("{id:guid}")]
+	public async Task<IActionResult> DeleteWorkout(Guid id)
+	{
+		//this will cascade delete sets cuz of appdbcontext setup
+		var w = await db.Workouts.FindAsync(id);
+		if (w is null) return NotFound();
+		db.Workouts.Remove(w);
+		await db.SaveChangesAsync();
+		return NoContent();
+	}
 }
