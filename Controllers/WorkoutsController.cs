@@ -2,22 +2,36 @@ using GymProgressTrackerAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GymProgressTrackerAPI.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace GymProgressTrackerAPI.Controllers;
 
 [ApiController]
 [Route("v1/workouts")]
 
-public class WorkoutsController(AppDbContext db) : ControllerBase
+public class WorkoutsController : ControllerBase
 {
+	private readonly AppDbContext _db;
+	private readonly UserManager<AppUser> _userManager;
+
+	public WorkoutsController(AppDbContext db, UserManager<AppUser> userManager)
+	{
+		_db = db;
+		_userManager = userManager;
+	}
+
+	//auth add on
+	private Guid GetUserId() => Guid.Parse(_userManager.GetUserId(User)!);
 	// maps requests on this route, fromquery frombody etc self-explanatory
 
 
+	//now only return specific user data
 	[HttpGet]
 	public async Task<IActionResult> List([FromQuery] DateOnly from, [FromQuery] DateOnly to)
 	{
-		var items = await db.Workouts
-			.Where(w => w.Date >= from && w.Date <= to)
+		var userId = GetUserId();
+		var items = await _db.Workouts
+			.Where(w => w.UserId == userId && w.Date >= from && w.Date <= to)
 			.Select(w => new { w.Id, w.Date, w.Notes })
 			.ToListAsync();
 		return Ok(items);
@@ -26,7 +40,10 @@ public class WorkoutsController(AppDbContext db) : ControllerBase
 	[HttpGet("{id:guid}")]
 	public async Task<IActionResult> GetWorkoutById(Guid id)
 	{
-		var w = await db.Workouts
+		var userId = GetUserId();
+
+		var w = await _db.Workouts
+			.Where(w => w.UserId == userId)
 			.Include(w => w.Sets)
 			.FirstOrDefaultAsync(w => w.Id == id);
 
@@ -48,16 +65,20 @@ public class WorkoutsController(AppDbContext db) : ControllerBase
 
 	public record CreateWorkoutDto(DateOnly Date, string? Notes);
 
+	//adding user specific stuff to create aswell
 	[HttpPost]
 	public async Task<IActionResult> Create([FromBody] CreateWorkoutDto req)
 	{
+		var userId = GetUserId();
+
 		var w = new Workout
 		{
+			UserId = userId,
 			Date = req.Date,
 			Notes = req.Notes
 		};
-		db.Workouts.Add(w);
-		await db.SaveChangesAsync();
+		_db.Workouts.Add(w);
+		await _db.SaveChangesAsync();
 
 		return Created($"/v1/workouts/{w.Id}", new { w.Id, w.Date, w.Notes, exercises = Array.Empty<object>() });
 	}
@@ -65,10 +86,13 @@ public class WorkoutsController(AppDbContext db) : ControllerBase
 	public record CreateSetDto(string ExerciseId, int Reps, decimal? Weight, decimal? Rpe);
 
 
+	//adding user stuff
 	[HttpPost("{id:guid}/sets")]
 	public async Task<IActionResult> AddSet(Guid id, [FromBody] CreateSetDto req)
 	{
-		var exists = await db.Workouts.AnyAsync(w => w.Id == id);
+		var userId = GetUserId();
+
+		var exists = await _db.Workouts.AnyAsync(w => w.UserId == userId && w.Id == id);
 		if (!exists) return NotFound();
 
 		//make sure exercise exists
@@ -80,32 +104,39 @@ public class WorkoutsController(AppDbContext db) : ControllerBase
 			Weight = req.Weight,
 			Rpe = req.Rpe
 		};
-		db.WorkoutSets.Add(set);
-		await db.SaveChangesAsync();
+		_db.WorkoutSets.Add(set);
+		await _db.SaveChangesAsync();
 		return Created($"/c1/sets/{set.Id}", new { set.Id, set.Reps, set.Weight, set.Rpe });
 	}
 
-	// i dont think this is very good like this but w.e for now
-	//
 
+	//adding userid stuff 
 	[HttpDelete("/v1/sets/{setId:guid}")]
 	public async Task<IActionResult> DeleteSet(Guid setId)
 	{
-		var s = await db.WorkoutSets.FindAsync(setId);
+		var s = await _db.WorkoutSets.FindAsync(setId);
 		if (s is null) return NotFound();
-		db.WorkoutSets.Remove(s);
-		await db.SaveChangesAsync();
+		_db.WorkoutSets.Remove(s);
+		await _db.SaveChangesAsync();
 		return NoContent();
 	}
 
 	[HttpDelete("{id:guid}")]
 	public async Task<IActionResult> DeleteWorkout(Guid id)
 	{
-		//this will cascade delete sets cuz of appdbcontext setup
-		var w = await db.Workouts.FindAsync(id);
+		var userId = GetUserId();
+		//this will cascade delete sets cuz of app_dbcontext setup
+		var w = await _db.Workouts.FindAsync(id);
 		if (w is null) return NotFound();
-		db.Workouts.Remove(w);
-		await db.SaveChangesAsync();
-		return NoContent();
+		if (w.UserId == userId)
+		{
+			_db.Workouts.Remove(w);
+			await _db.SaveChangesAsync();
+			return NoContent();
+		}
+		else
+		{
+			return Unauthorized();
+		}
 	}
 }
