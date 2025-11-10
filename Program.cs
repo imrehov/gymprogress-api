@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+// dbcontext
 builder.Services.AddDbContext<AppDbContext>(opt =>
 		opt.UseSqlite("Data Source=gym.db"));
 
@@ -22,14 +24,15 @@ builder.Services
 	.AddEntityFrameworkStores<AppDbContext>()
 	.AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-	.AddCookie(IdentityConstants.ApplicationScheme, options =>
-			{
-				options.LoginPath = "/login";
-				options.SlidingExpiration = true;
-				options.Cookie.SameSite = SameSiteMode.None;
-				options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-			});
+//cookie config
+builder.Services.ConfigureApplicationCookie(options =>
+		{
+			options.Cookie.Name = "GymAuth";
+			options.Cookie.SameSite = SameSiteMode.None;
+			options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+			options.SlidingExpiration = true;
+		}
+	);
 
 builder.Services.AddAuthorization();
 
