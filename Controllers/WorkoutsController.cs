@@ -21,7 +21,17 @@ public class WorkoutsController : ControllerBase
 	}
 
 	//auth add on
-	private Guid GetUserId() => Guid.Parse(_userManager.GetUserId(User)!);
+	private bool TryGetUserId(out Guid userId)
+	{
+		userId = default;
+
+		var idString = _userManager.GetUserId(User);
+		if (string.IsNullOrEmpty(idString))
+		{
+			return false;
+		}
+		return Guid.TryParse(idString, out userId);
+	}
 	// maps requests on this route, fromquery frombody etc self-explanatory
 
 
@@ -29,7 +39,10 @@ public class WorkoutsController : ControllerBase
 	[HttpGet]
 	public async Task<IActionResult> List([FromQuery] DateOnly from, [FromQuery] DateOnly to)
 	{
-		var userId = GetUserId();
+		if (!TryGetUserId(out var userId))
+		{
+			return Unauthorized();
+		}
 		var items = await _db.Workouts
 			.Where(w => w.UserId == userId && w.Date >= from && w.Date <= to)
 			.Select(w => new { w.Id, w.Date, w.Notes })
@@ -40,7 +53,10 @@ public class WorkoutsController : ControllerBase
 	[HttpGet("{id:guid}")]
 	public async Task<IActionResult> GetWorkoutById(Guid id)
 	{
-		var userId = GetUserId();
+		if (!TryGetUserId(out var userId))
+		{
+			return Unauthorized();
+		}
 
 		var w = await _db.Workouts
 			.Where(w => w.UserId == userId)
@@ -69,7 +85,10 @@ public class WorkoutsController : ControllerBase
 	[HttpPost]
 	public async Task<IActionResult> Create([FromBody] CreateWorkoutDto req)
 	{
-		var userId = GetUserId();
+		if (!TryGetUserId(out var userId))
+		{
+			return Unauthorized();
+		}
 
 		var w = new Workout
 		{
@@ -90,7 +109,10 @@ public class WorkoutsController : ControllerBase
 	[HttpPost("{id:guid}/sets")]
 	public async Task<IActionResult> AddSet(Guid id, [FromBody] CreateSetDto req)
 	{
-		var userId = GetUserId();
+		if (!TryGetUserId(out var userId))
+		{
+			return Unauthorized();
+		}
 
 		var exists = await _db.Workouts.AnyAsync(w => w.UserId == userId && w.Id == id);
 		if (!exists) return NotFound();
@@ -124,7 +146,10 @@ public class WorkoutsController : ControllerBase
 	[HttpDelete("{id:guid}")]
 	public async Task<IActionResult> DeleteWorkout(Guid id)
 	{
-		var userId = GetUserId();
+		if (!TryGetUserId(out var userId))
+		{
+			return Unauthorized();
+		}
 		//this will cascade delete sets cuz of app_dbcontext setup
 		var w = await _db.Workouts.FindAsync(id);
 		if (w is null) return NotFound();
