@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace GymProgressTrackerAPI.Data;
 
+//dont forget primarykey for identity
 public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
 {
 	public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
@@ -16,7 +17,12 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		//it crashes without this line
+		base.OnModelCreating(modelBuilder);
+
+
 		modelBuilder.Entity<Exercise>().HasKey(e => e.Id);
+
 		modelBuilder.Entity<WorkoutSet>()
 				.HasOne(s => s.Workout)
 			    .WithMany(w => w.Sets)
