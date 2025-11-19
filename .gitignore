@@ -8,7 +8,7 @@ obj/
 *.db-wal
 
 # --- EF Core migration temporary files ---
-Migrations/ (optional — keep if you want migrations tracked)
+#Migrations/ (optional — keep if you want migrations tracked)
 
 # --- User / environment files ---
 *.user
