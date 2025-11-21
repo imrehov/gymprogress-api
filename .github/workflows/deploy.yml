@@ -1,0 +1,41 @@
+name: Deploy Backend API
+
+on:
+  push:
+    branches:
+      - main   # deploy production on push to main
+      # - dev  # uncomment to deploy staging from dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore and Publish
+        run: dotnet publish -c Release -o out
+
+      - name: Copy files to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: deploz
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "out/*"
+          target: "/var/www/GymProgress-api/out"
+
+      - name: Restart API service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: deploz
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            sudo systemctl restart gym-api.service
