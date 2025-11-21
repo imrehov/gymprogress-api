@@ -46,14 +46,15 @@ builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowFrontend", policy =>
 	{
-		policy.WithOrigins(
-				"http://localhost:3000",
-			"gymprogress-deploy.vercel.app",
-				"https://gym.hovodzak.hu"
-			    )
-			    .AllowAnyHeader()
-			    .AllowAnyMethod()
-			    .AllowCredentials();
+		policy
+			  .SetIsOriginAllowed(origin =>
+			      origin == "http://localhost:3000" ||
+			      origin == "https://gym.hovodzak.hu" ||
+			      origin.EndsWith(".vercel.app")
+			  )
+			  .AllowAnyHeader()
+			  .AllowAnyMethod()
+			  .AllowCredentials();
 	});
 });
 
