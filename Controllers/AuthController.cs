@@ -24,7 +24,10 @@ public class AuthController(
 
 		if (!result.Succeeded)
 		{
-			return BadRequest(result.Errors);
+			return BadRequest(new
+			{
+				errors = result.Errors.Select(e => e.Description)
+			});
 		}
 
 		await signInManager.SignInAsync(user, isPersistent: false);

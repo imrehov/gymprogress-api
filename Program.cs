@@ -20,6 +20,8 @@ builder.Services
 			options.Password.RequireNonAlphanumeric = false;
 			options.Password.RequireUppercase = false;
 			options.Password.RequiredLength = 6;
+			options.Password.RequireDigit = false;
+			options.Password.RequireLowercase = false;
 		})
 	.AddEntityFrameworkStores<AppDbContext>()
 	.AddDefaultTokenProviders();
