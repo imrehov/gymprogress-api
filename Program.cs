@@ -71,19 +71,16 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseRouting();
+app.UseRouting();  // IMPORTANT
 
-app.UseCors("AllowFrontend");
+// don't use UseCors here yet
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+// Force CORS on all controllers here:
+app.MapControllers().RequireCors("AllowFrontend");
 
-app.MapGet("/", () =>
-{
-	Console.WriteLine("Hello");
-	return TypedResults.Ok();
-});
+app.MapGet("/", () => TypedResults.Ok());
 
 app.Run();
