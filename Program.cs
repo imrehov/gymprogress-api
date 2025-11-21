@@ -61,25 +61,24 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 	app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-app.UseRouting();
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseCors("AllowFrontend");
 
-//auth stuff again
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.MapGet("/", () =>
 {
@@ -88,5 +87,3 @@ app.MapGet("/", () =>
 });
 
 app.Run();
-
-
