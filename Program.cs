@@ -66,6 +66,9 @@ if (app.Environment.IsDevelopment())
 {
 	app.MapOpenApi();
 }
+
+app.UseHttpsRedirection();
+app.UseRouting();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("AllowFrontend");
@@ -77,7 +80,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseHttpsRedirection();
 
 app.MapGet("/", () =>
 {
