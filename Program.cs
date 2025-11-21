@@ -69,17 +69,17 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI();
 
+// (optional, see note below)
 app.UseHttpsRedirection();
 
-app.UseRouting();  // IMPORTANT
+app.UseRouting();
 
-// don't use UseCors here yet
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Force CORS on all controllers here:
-app.MapControllers().RequireCors("AllowFrontend");
+app.MapControllers();
 
 app.MapGet("/", () => TypedResults.Ok());
 
