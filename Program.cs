@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // dbcontext
 builder.Services.AddDbContext<AppDbContext>(opt =>
-		opt.UseSqlite("Data Source=gym.db"));
+opt.UseSqlite("Data Source=/var/www/GymProgress-api/gym.db"));
 
 //auth stuff
 
@@ -60,6 +60,13 @@ builder.Services.AddCors(options =>
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	db.Database.Migrate();
+}
+
 
 if (app.Environment.IsDevelopment())
 {
