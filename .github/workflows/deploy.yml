@@ -28,8 +28,8 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: deploz
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "out/*"
-          target: "/var/www/GymProgress-api/out"
+          source: "out/**"
+          target: "/var/www/GymProgress-api"
 
       - name: Restart API service
         uses: appleboy/ssh-action@master
