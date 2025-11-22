@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // dbcontext
 builder.Services.AddDbContext<AppDbContext>(opt =>
-opt.UseSqlite("Data Source=/var/www/GymProgress-api/gym.db"));
+    opt.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
 //auth stuff
 
