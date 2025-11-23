@@ -164,4 +164,18 @@ public class WorkoutsController : ControllerBase
 			return Unauthorized();
 		}
 	}
+
+	[HttpPatch("{id}")]
+	public async Task<IActionResult> UpdateWorkout(string id, [FromBody] UpdateWorkoutDto dto)
+	{
+		var w = await _db.Workouts.FindAsync(id);
+		if (w is null) return NotFound();
+
+		w.Notes = dto.Notes?.Trim();
+		await _db.SaveChangesAsync();
+
+		return Ok(w);
+	}
 }
+
+public record UpdateWorkoutDto(string? Notes);
