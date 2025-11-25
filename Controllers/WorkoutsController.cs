@@ -45,7 +45,7 @@ public class WorkoutsController : ControllerBase
 		}
 		var items = await _db.Workouts
 			.Where(w => w.UserId == userId && w.Date >= from && w.Date <= to)
-			.Select(w => new { w.Id, w.Date, w.Notes })
+			.Select(w => new { w.Id, w.Date, w.Notes, w.Title })
 			.ToListAsync();
 		return Ok(items);
 	}
@@ -68,6 +68,7 @@ public class WorkoutsController : ControllerBase
 			w.Id,
 			w.Date,
 			w.Notes,
+			w.Title,
 			exercises = w.Sets
 				.GroupBy(s => s.ExerciseId)
 				.Select(g => new
@@ -79,7 +80,7 @@ public class WorkoutsController : ControllerBase
 		});
 	}
 
-	public record CreateWorkoutDto(DateOnly Date, string? Notes);
+	public record CreateWorkoutDto(DateOnly Date, string? Notes, string? Title);
 
 	//adding user specific stuff to create aswell
 	[HttpPost]
@@ -94,12 +95,13 @@ public class WorkoutsController : ControllerBase
 		{
 			UserId = userId,
 			Date = req.Date,
-			Notes = req.Notes
+			Notes = req.Notes,
+			Title = req.Title
 		};
 		_db.Workouts.Add(w);
 		await _db.SaveChangesAsync();
 
-		return Created($"/v1/workouts/{w.Id}", new { w.Id, w.Date, w.Notes, exercises = Array.Empty<object>() });
+		return Created($"/v1/workouts/{w.Id}", new { w.Id, w.Date, w.Notes, w.Title, exercises = Array.Empty<object>() });
 	}
 
 	public record CreateSetDto(string ExerciseId, int Reps, decimal? Weight, decimal? Rpe);
@@ -171,11 +173,11 @@ public class WorkoutsController : ControllerBase
 		var w = await _db.Workouts.FindAsync(id);
 		if (w is null) return NotFound();
 
-		w.Notes = dto.Notes?.Trim();
+		w.Title = dto.Title?.Trim();
 		await _db.SaveChangesAsync();
 
 		return Ok(w);
 	}
 }
 
-public record UpdateWorkoutDto(string? Notes);
+public record UpdateWorkoutDto(string? Title);
