@@ -165,8 +165,8 @@ public class WorkoutsController : ControllerBase
 		}
 	}
 
-	[HttpPatch("{id}")]
-	public async Task<IActionResult> UpdateWorkout(string id, [FromBody] UpdateWorkoutDto dto)
+	[HttpPatch("{id:guid}")]
+	public async Task<IActionResult> UpdateWorkout(Guid id, [FromBody] UpdateWorkoutDto dto)
 	{
 		var w = await _db.Workouts.FindAsync(id);
 		if (w is null) return NotFound();
